@@ -4,7 +4,7 @@ public class Board {
 
 	private int rows;
 	private int columns;
-	private Piece[][] pieces;
+	private Piece[][] pieces; //matriz de peças
 	
 	//Constructors
 	public Board(int rows, int columns) {
@@ -30,8 +30,16 @@ public class Board {
 		this.columns = columns;
 	}
 	
+	//Methods
+	public Piece piece(int row, int column) {
+		return pieces[row][column]; 
+		//esse metodo retorna a matriz de peças
+	}
 	
-	
+		//sobrecarga - metodo com mesmo nome do de cima
+	public Piece piece(Position position) {
+		return pieces[position.getRow()][position.getColumn()];
+	}	
 	
 	
 	

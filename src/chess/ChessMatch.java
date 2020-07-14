@@ -1,6 +1,7 @@
 package chess;
 
 import boardgame.Board;
+import boardgame.Piece;
 import boardgame.Position;
 import chess.pieces.King;
 import chess.pieces.Rook;
@@ -24,6 +25,40 @@ public class ChessMatch {
 		}
 		return mat;
 	}
+	
+	//--------------------------------------------
+	public ChessPiece performChessMove(ChessPosition sourcePosition, ChessPosition targetPosition) {
+		//primeiro: transformar as posições recebidas por argumento em posição de matriz.
+		Position source = sourcePosition.toPosition();
+		Position target = targetPosition.toPosition();
+		//segundo: validar se nessa posição de origem já há uma peça.
+		validateSourcePosition(source);
+		Piece capturedPiece = makeMove(source,target);
+		//terceiro: retornar a peça capturada (Piece) em formato ChessPiece (usar downcasting).
+		return (ChessPiece) capturedPiece;
+	}
+	
+	private Piece makeMove(Position source, Position target) {
+		//primeiro: retirar a peça na posição de origem.
+		Piece p = board.removePiece(source);
+		//segundo: remover a peça que possa estar na posição de destino, ou seja, capturá-la.
+		Piece capturedPiece = board.removePiece(target);
+		//terceiro: tira a peça da posição "source" e coloca na posição "target".
+		board.placePiece(p, target);
+		//quarto: retornar a peça capturada.
+		return capturedPiece;
+	}
+	
+	private void validateSourcePosition(Position position) {
+		//se tiver não tiver uma peça na posição recebida por argumento, lanço exceção
+		if (!board.thereIsAPiece(position)) {
+			throw new ChessException("There is no piece on source position.");
+		}
+	}
+	
+
+	//--------------------------------------------
+	
 	
 	/*função que recebe: 1 peça em coordenadas de batalha naval.
 	faz: transforma em coordenadas de matriz e instancia a peça no board.*/

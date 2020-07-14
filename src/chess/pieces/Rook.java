@@ -16,5 +16,13 @@ public class Rook extends ChessPiece{
 		return "R";
 	}
 	
+	@Override
+	public boolean[][] possibleMoves() {
+		/*Criar uma matriz do tamanho do tabuleiro.
+		Essa matriz inicia-se com todos os valores falsos,
+		como se a peça estivesse presa*/
+		boolean[][] mat = new boolean [getBoard().getRows()][getBoard().getColumns()]; 
+		return mat;
+	}
 	
 }

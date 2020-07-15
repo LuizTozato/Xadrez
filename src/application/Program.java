@@ -25,7 +25,13 @@ public class Program {
 				// O usuário diz qual é a origem da peça
 				System.out.print("Source: ");
 				ChessPosition source = UI.readChessPosition(sc);
-
+				
+				//receber a matriz de possibilidades e gerar sobrecarga no printBoard
+				boolean[][] possibleMoves = chessMatch.possibleMoves(source);
+				UI.clearScreen();
+				UI.printBoard(chessMatch.getPieces(), possibleMoves);
+				
+				
 				System.out.println();
 
 				// O usuário diz qual é o destino da peça

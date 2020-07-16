@@ -8,11 +8,25 @@ import chess.pieces.Rook;
 
 public class ChessMatch {
 
+	private int turn;
+	private Color currentPlayer;
 	private Board board;
 	
+	//Constructor
 	public ChessMatch() {
 		board = new Board(8,8);
+		turn = 1;
+		currentPlayer = Color.WHITE;
 		initialSetup();
+	}
+	
+	//Getters and setter
+	public int getTurn() {
+		return turn;
+	}
+	
+	public Color getCurrentPlayer() {
+		return currentPlayer;
 	}
 	
 	public ChessPiece[][] getPieces(){
@@ -49,7 +63,10 @@ public class ChessMatch {
 		validateTargetPosition(source,target);
 		Piece capturedPiece = makeMove(source,target);
 		
-		//terceiro: retornar a peça capturada (Piece) em formato ChessPiece (usar downcasting).
+		//terceiro: trocar o turno.
+		nextTurn();		
+		
+		//quarto: retornar a peça capturada (Piece) em formato ChessPiece (usar downcasting).
 		return (ChessPiece) capturedPiece;
 	}
 	
@@ -68,11 +85,17 @@ public class ChessMatch {
 	}
 	
 	private void validateSourcePosition(Position position) {
-		//se não tiver uma peça na posição recebida por argumento, lanço exceção
+		//primeiro: se não tiver uma peça na posição recebida por argumento, lanço exceção.
 		if (!board.thereIsAPiece(position)) {
 			throw new ChessException("There is no piece on source position.");
 		}
-		//se não tiver movimento possível, lanço exceção 
+		/*segundo:se a cor da peça selecionada não for a do currentPlayer, lanço exceção.
+		  Obs:fazer o downcasting pois a cor está em ChessPiece e a peça pega é do tipo Piece */
+		if(currentPlayer != ((ChessPiece)board.piece(position)).getColor()) {
+			throw new ChessException("The chosen piece is not yours.");
+		}
+		
+		//terceiro: se não tiver movimento possível, lanço exceção 
 		if(!board.piece(position).isThereAnyPossibleMove()) {
 			throw new ChessException("There is no possible moves for the chosen piece.");
 		}
@@ -87,6 +110,12 @@ public class ChessMatch {
 	}
 	//--------------------------------------------
 	
+	private void nextTurn() {
+		turn ++;
+		//usaremos if else em formato de linha
+		//"se o jogador for o branco, retornar o preto, senão, retornar o branco"
+		currentPlayer = (currentPlayer == Color.WHITE)? Color.BLACK : Color.WHITE;
+	}
 	
 	/*função que recebe: 1 peça em coordenadas de batalha naval.
 	faz: transforma em coordenadas de matriz e instancia a peça no board.*/

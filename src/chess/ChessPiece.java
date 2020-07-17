@@ -19,7 +19,12 @@ public abstract class ChessPiece extends Piece{
 		return color;
 	}
 	
-	protected boolean isThereOpponentPiece(Position position) {
+	public ChessPosition getChessPosition() {
+		return ChessPosition.fromPosition(position);
+	}
+	
+	//Methods
+ 	protected boolean isThereOpponentPiece(Position position) {
 		//pegar a peça e ver se ela é adversária ou não.
 		ChessPiece p = (ChessPiece) getBoard().piece(position);
 		/*quando se lê a celula da matriz, ela não pode ser null ou a cor da 

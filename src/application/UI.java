@@ -1,7 +1,10 @@
 package application;
 
+import java.util.Arrays;
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import chess.ChessMatch;
 import chess.ChessPiece;
@@ -48,8 +51,10 @@ public class UI {
 		}
 	}
 	
-	public static void printMatch(ChessMatch chessMatch) {
+	public static void printMatch(ChessMatch chessMatch, List<ChessPiece> captured) {
 		printBoard(chessMatch.getPieces());
+		System.out.println();
+		printCapturedPieces(captured);
 		System.out.println();
 		System.out.println("Turn: " + chessMatch.getTurn());
 		System.out.println("Waiting player: " + chessMatch.getCurrentPlayer());
@@ -97,4 +102,37 @@ public class UI {
 		}
 		System.out.print(" ");
 	}
+
+	private static void printCapturedPieces(List <ChessPiece> captured) {
+		//primeiro: recebemos a lista de todos os capturados. Criamos duas listas filtradas por cor.
+		List<ChessPiece> white = captured.stream().filter(x -> x.getColor() == Color.WHITE).collect(Collectors.toList());
+		List<ChessPiece> black = captured.stream().filter(x -> x.getColor() == Color.BLACK).collect(Collectors.toList());
+		System.out.println("Captured pieces: ");
+		System.out.print("White: ");
+		//segundo: quero imprimir a lista toda em branco:
+		System.out.print(ANSI_WHITE);
+		//terceiro: para imprimir a lista, usamos um macete do java
+		//Jeitinho padrão para imprimir um array de valores
+		System.out.println(Arrays.toString(white.toArray()));
+		
+		System.out.print(ANSI_RESET);
+		
+		//terceiro: resetar a cor de impressão
+		System.out.print(ANSI_YELLOW);
+		System.out.print("Black: ");
+		//quarto: fazer a mesma coisa para a lista preta
+		System.out.println(Arrays.toString(black.toArray()));
+		
+		System.out.print(ANSI_RESET);
+		
+		
+	}
+
+
+
+
+
+
+
+
 }

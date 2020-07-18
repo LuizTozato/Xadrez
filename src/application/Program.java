@@ -20,7 +20,7 @@ public class Program {
 		//instanciar a lista de peças que serão capturadas
 		List<ChessPiece> captured = new ArrayList<>();
 
-		while (chessMatch.getCheckMate() == false) {
+		while (!chessMatch.getCheckMate()) {
 			try {
 				UI.clearScreen();
 				UI.printMatch(chessMatch, captured);
@@ -49,11 +49,7 @@ public class Program {
 					captured.add(capturedPiece);
 				}
 			} 
-			catch (ChessException e) {
-				System.out.println(e.getMessage());
-				sc.nextLine(); //aguardar o usuário digitar Enter
-			} 
-			catch (InputMismatchException e) {
+			catch (ChessException | InputMismatchException e) {
 				System.out.println(e.getMessage());
 				sc.nextLine(); //aguardar o usuário digitar Enter
 			}

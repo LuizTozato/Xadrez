@@ -14,7 +14,7 @@ import chess.Color;
 public class UI {
 
 	// https://stackoverflow.com/questions/5762491/how-to-print-color-in-console-using-system-out-println
-	
+
 	public static final String ANSI_RESET = "\u001B[0m";
 	public static final String ANSI_BLACK = "\u001B[30m";
 	public static final String ANSI_RED = "\u001B[31m";
@@ -33,7 +33,7 @@ public class UI {
 	public static final String ANSI_PURPLE_BACKGROUND = "\u001B[45m";
 	public static final String ANSI_CYAN_BACKGROUND = "\u001B[46m";
 	public static final String ANSI_WHITE_BACKGROUND = "\u001B[47m";
-	
+
 	public static void clearScreen() {
 		System.out.println("\033[H\033[02J");
 		System.out.flush();
@@ -41,27 +41,27 @@ public class UI {
 
 	public static ChessPosition readChessPosition(Scanner sc) {
 		try {
-		String s = sc.nextLine();
-		char column = s.charAt(0);
-		int row = Integer.parseInt(s.substring(1));
-		return new ChessPosition(column, row);
+			String s = sc.nextLine();
+			char column = s.charAt(0);
+			int row = Integer.parseInt(s.substring(1));
+			return new ChessPosition(column, row);
 		}
 		catch (RuntimeException e) {
 			throw new InputMismatchException("Error reading ChessPosition. Valid values are from a1 t h8.");
 		}
 	}
-	
+
 	public static void printMatch(ChessMatch chessMatch, List<ChessPiece> captured) {
 		printBoard(chessMatch.getPieces());
 		System.out.println();
 		printCapturedPieces(captured);
 		System.out.println();
 		System.out.println("Turn: " + chessMatch.getTurn());
-		
+
 		//testar se não há checkmate. Se não houver, pode continuar o jogo.
-		if (chessMatch.getCheckMate() == false) {
+		if (!chessMatch.getCheckMate()) {
 			System.out.println("Waiting player: " + chessMatch.getCurrentPlayer());
-			if(chessMatch.getCheck() == true) {
+			if(chessMatch.getCheck()) {
 				System.out.println("CHECK!");
 			}
 		}
@@ -69,9 +69,9 @@ public class UI {
 			System.out.println("CHECKMATE!!!");
 			System.out.println("Winner " + chessMatch.getCurrentPlayer());
 		}
-		
+
 	}
-	
+
 	public static void printBoard(ChessPiece[][] pieces) {
 		// aqui vamos imprimir todas as peças
 		for (int i = 0; i < pieces.length; i++) { // matriz quadrada
@@ -100,7 +100,7 @@ public class UI {
 		if(background) {
 			System.out.print(ANSI_BLUE_BACKGROUND);
 		}
-		
+
 		if (piece == null) {
 			System.out.print("-" + ANSI_RESET);
 		} else {
@@ -110,7 +110,7 @@ public class UI {
 			else {
 				System.out.print(ANSI_YELLOW + piece + ANSI_RESET);
 			}
-			
+
 		}
 		System.out.print(" ");
 	}
@@ -126,15 +126,15 @@ public class UI {
 		//terceiro: para imprimir a lista, usamos um macete do java
 		//Jeitinho padrão para imprimir um array de valores
 		System.out.println(Arrays.toString(white.toArray()));
-		
+
 		System.out.print(ANSI_RESET);
-		
+
 		//terceiro: resetar a cor de impressão
 		System.out.print(ANSI_YELLOW);
 		System.out.print("Black: ");
 		//quarto: fazer a mesma coisa para a lista preta
 		System.out.println(Arrays.toString(black.toArray()));
-		
+
 		System.out.print(ANSI_RESET);
 		
 		

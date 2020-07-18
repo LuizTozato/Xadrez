@@ -82,22 +82,22 @@ public class ChessMatch {
 		Piece capturedPiece = makeMove(source,target);
 		
 		//terceiro: se, após o movimento da peça, o rei foi colocado em check, temos que desfazer a jogada.
-		if(testCheck(currentPlayer) == true) {
+		if(testCheck(currentPlayer)) {
 			undoMove(source, target, capturedPiece);
 			throw new ChessException("Voce nao pode se colocar em check");
 		}
 		
 		//quarto: se o oponente ficou em check, marcar verdadeiro, senão, falso.
-		check = (testCheck(opponent(currentPlayer)) == true)? true : false;
+		check = testCheck(opponent(currentPlayer));
 		
 		/*quinto: se houver checkMate, finalizar a partida. Testar para o oponente 
 		pois é quem recebe a jogada que acabou de acontecer.*/ 
-		if(testCheckMate(opponent(currentPlayer)) == true) {
+		if(testCheckMate(opponent(currentPlayer))) {
 			checkMate = true;
 		}
 		else {
-		//sexto: trocar o turno se não houve checkMate.
-		nextTurn();		 
+			//sexto: trocar o turno se não houve checkMate.
+			nextTurn();
 		}
 		
 		//sétimo: retornar a peça capturada (Piece) em formato ChessPiece (usar downcasting).
@@ -200,7 +200,7 @@ public class ChessMatch {
 		//terceiro: verificar peça por peça inimiga se o possível movimento atinge o meu rei.
 		for (Piece p : opponentPieces) {
 			boolean[][] mat = p.possibleMoves();
-			if (mat[kingPosition.getRow()][kingPosition.getColumn()] == true) {
+			if (mat[kingPosition.getRow()][kingPosition.getColumn()]) {
 				return true;
 			}
 		}
@@ -225,7 +225,7 @@ public class ChessMatch {
 			boolean[][] mat = p.possibleMoves();
 			for(int i = 0; i<board.getRows(); i++) {
 				for(int j=0; j<board.getColumns(); j++) {
-					if(mat[i][j] == true) {	
+					if(mat[i][j]) {
 						/*Agora vamos simular o deslocamento de cada peça para todas as suas posições.
 						 *Assim que simularmos esse movimento, veremos se saimos da situação de Check.
 						 *Se sair, continua o jogo. Senão, é checkMate*/
@@ -235,7 +235,7 @@ public class ChessMatch {
 						boolean testCheck = testCheck(color); //testei
 						undoMove(source,target,capturedPiece); //desfiz o movimento
 						//vou ver como está o testCheck. Se estiver falso, a jogada tira o rei de check
-						if (testCheck == false) {
+						if (!testCheck) {
 							return false;
 						}
 					}

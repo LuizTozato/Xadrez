@@ -1,6 +1,6 @@
 package boardgame;
 
-public class Board {
+public class Board<Piece extends boardgame.Piece> {
 
 	private int rows;
 	private int columns;
@@ -13,7 +13,9 @@ public class Board {
 		}
 		this.rows = rows;
 		this.columns = columns;
-		pieces = new Piece[rows][columns];
+		//por algum motivo obscuro o Java não deixa criar matriz de tipo generico
+		//noinspection unchecked
+		pieces = (Piece[][]) new boardgame.Piece[rows][columns];
 	}
 
 	//Getters and setters

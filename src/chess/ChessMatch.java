@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import boardgame.Board;
-import boardgame.Piece;
 import boardgame.Position;
 import chess.pieces.King;
 import chess.pieces.Rook;
@@ -14,16 +13,16 @@ public class ChessMatch {
 
 	private int turn;
 	private Color currentPlayer;
-	private Board board;
+	private Board<ChessPiece> board;
 	private boolean check = false;
 	private boolean checkMate = false;	
 	
-	private List<Piece> piecesOnTheBoard = new ArrayList<>();
-	private List<Piece> capturedPieces = new ArrayList<>();
+	private List<ChessPiece> piecesOnTheBoard = new ArrayList<>();
+	private List<ChessPiece> capturedPieces = new ArrayList<>();
 	
 	//Constructor
 	public ChessMatch() {
-		board = new Board(8,8);
+		board = new Board<>(8,8);
 		turn = 1;
 		currentPlayer = Color.WHITE;
 		initialSetup();
@@ -50,7 +49,7 @@ public class ChessMatch {
 		ChessPiece[][] mat = new ChessPiece[board.getRows()][board.getColumns()];
 		for (int i=0; i<board.getRows();i++) {
 			for (int j=0; j<board.getColumns();j++) {
-				mat[i][j] = (ChessPiece) board.piece(i, j);
+				mat[i][j] = board.piece(i, j);
 			//aqui estou abastecendo a matriz de peças com as peças do boardgame 
 			}
 		}
@@ -79,7 +78,7 @@ public class ChessMatch {
 		 * validar a posição de destino.*/
 		validateSourcePosition(source);
 		validateTargetPosition(source,target);
-		Piece capturedPiece = makeMove(source,target);
+		ChessPiece capturedPiece = makeMove(source,target);
 		
 		//terceiro: se, após o movimento da peça, o rei foi colocado em check, temos que desfazer a jogada.
 		if(testCheck(currentPlayer)) {
@@ -101,15 +100,15 @@ public class ChessMatch {
 		}
 		
 		//sétimo: retornar a peça capturada (Piece) em formato ChessPiece (usar downcasting).
-		return (ChessPiece) capturedPiece;
+		return capturedPiece;
 	}
 	
-	private Piece makeMove(Position source, Position target) {
+	private ChessPiece makeMove(Position source, Position target) {
 		//primeiro: retirar a peça na posição de origem.
-		Piece p = board.removePiece(source);
+		ChessPiece p = board.removePiece(source);
 		
 		//segundo: remover a peça que possa estar na posição de destino, ou seja, capturá-la.
-		Piece capturedPiece = board.removePiece(target);
+		ChessPiece capturedPiece = board.removePiece(target);
 		
 		//terceiro: tira a peça da posição "source" e coloca na posição "target".
 		board.placePiece(p, target);
@@ -122,10 +121,10 @@ public class ChessMatch {
 		return capturedPiece;
 	}
 	
-	private void undoMove(Position source, Position target, Piece capturedPiece) {
+	private void undoMove(Position source, Position target, ChessPiece capturedPiece) {
 		/*primeiro: lógica de Check. Se o movimento for deixar o rei em check, precisamos desfazê-lo.
 		 *Aqui devolvemos a peça que teria sido movida ao local onde ela estava. */
-		Piece p = board.removePiece(target);
+		ChessPiece p = board.removePiece(target);
 		board.placePiece(p, source);
 		//segundo: se uma peça fosse capturada, temos que devolvê-la à sua origem tambem
 		if (capturedPiece != null) {
@@ -144,7 +143,7 @@ public class ChessMatch {
 		}
 		/*segundo:se a cor da peça selecionada não for a do currentPlayer, lanço exceção.
 		  Obs:fazer o downcasting pois a cor está em ChessPiece e a peça pega é do tipo Piece */
-		if(currentPlayer != ((ChessPiece)board.piece(position)).getColor()) {
+		if(currentPlayer != board.piece(position).getColor()) {
 			throw new ChessException("The chosen piece is not yours.");
 		}
 		
@@ -176,11 +175,11 @@ public class ChessMatch {
 	
 	private ChessPiece king(Color color) {
 		//primeiro: quero a lista de peças no tabuleiro que são da mesma cor da passada por argumento.
-		List<Piece> list = piecesOnTheBoard.stream().filter(x -> ((ChessPiece)x).getColor() == color).collect(Collectors.toList());
-		for (Piece p : list) {
+		List<ChessPiece> list = piecesOnTheBoard.stream().filter(x -> x.getColor() == color).collect(Collectors.toList());
+		for (ChessPiece p : list) {
 			//para cada peça encontrada, vou verificar se é um rei. Se for, vou retorná-lo.
 			if(p instanceof King) {
-				return (ChessPiece) p;
+				return p;
 			}
 		}
 		//segundo: se o for each não encontrar nenhum rei, lanço exceção
@@ -193,12 +192,12 @@ public class ChessMatch {
 		Daí pega a posição de xadrez dele e transforma em posição de matriz*/
 		Position kingPosition = king(color).getChessPosition().toPosition();
 		//segundo: gerar uma lista com as peças inimigas.
-		List<Piece> opponentPieces = piecesOnTheBoard
+		List<ChessPiece> opponentPieces = piecesOnTheBoard
 									 .stream()
-									 .filter(x -> ((ChessPiece)x).getColor() == opponent(color))
+									 .filter(x -> x.getColor() == opponent(color))
 									 .collect(Collectors.toList());
 		//terceiro: verificar peça por peça inimiga se o possível movimento atinge o meu rei.
-		for (Piece p : opponentPieces) {
+		for (ChessPiece p : opponentPieces) {
 			boolean[][] mat = p.possibleMoves();
 			if (mat[kingPosition.getRow()][kingPosition.getColumn()]) {
 				return true;
@@ -211,17 +210,17 @@ public class ChessMatch {
 	
 	private boolean testCheckMate(Color color) {
 		//primeiro: se não está em check, também não está em check mate.
-		if (testCheck(color) == false) {
+		if (!testCheck(color)) {
 			return false;
 		}
 		//segundo: criar uma lista com todas as peças no tabuleiro que são da cor vinda em argumento
-		List<Piece> list = piecesOnTheBoard
+		List<ChessPiece> list = piecesOnTheBoard
 						   .stream()
-						   .filter(x -> ((ChessPiece)x).getColor() == color)
+						   .filter(x -> x.getColor() == color)
 						   .collect(Collectors.toList());
 		
 		//terceiro: analisar todos os movimentos possíveis de cada peça.
-		for (Piece p : list) {
+		for (ChessPiece p : list) {
 			boolean[][] mat = p.possibleMoves();
 			for(int i = 0; i<board.getRows(); i++) {
 				for(int j=0; j<board.getColumns(); j++) {
@@ -229,9 +228,9 @@ public class ChessMatch {
 						/*Agora vamos simular o deslocamento de cada peça para todas as suas posições.
 						 *Assim que simularmos esse movimento, veremos se saimos da situação de Check.
 						 *Se sair, continua o jogo. Senão, é checkMate*/
-						Position source = ((ChessPiece)p).getChessPosition().toPosition();
+						Position source = p.getChessPosition().toPosition();
 						Position target = new Position(i,j);
-						Piece capturedPiece = makeMove(source, target); //fiz o movimento
+						ChessPiece capturedPiece = makeMove(source, target); //fiz o movimento
 						boolean testCheck = testCheck(color); //testei
 						undoMove(source,target,capturedPiece); //desfiz o movimento
 						//vou ver como está o testCheck. Se estiver falso, a jogada tira o rei de check

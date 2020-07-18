@@ -7,7 +7,7 @@ import chess.Color;
 
 public class King extends ChessPiece{
 
-	public King(Board board, Color color) {
+	public King(Board<ChessPiece> board, Color color) {
 		super(board, color);
 	}
 
@@ -18,7 +18,7 @@ public class King extends ChessPiece{
 	private boolean canMove(Position position) {
 		/*primeiro: pega a peça do tabuleiro. Faça downcasting pq o que vem do 
 		  tabuleiro é Piece, superclasse, e não ChessPiece, subclasse.*/
-		ChessPiece p = (ChessPiece) getBoard().piece(position);
+		ChessPiece p = getBoard().piece(position);
 		/*segundo: ver se essa peça "p" não é nula e se é de cor diferente da 
 		  cor do rei, ou seja, uma peça adversária.*/
 		return p == null || p.getColor() != getColor();

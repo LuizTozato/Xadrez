@@ -105,8 +105,9 @@ public class ChessMatch {
 	}
 	
 	private Piece makeMove(Position source, Position target) {
-		//primeiro: retirar a peça na posição de origem.
-		Piece p = board.removePiece(source);
+		//primeiro: retirar a peça na posição de origem. Usando downcasting.
+		ChessPiece p = (ChessPiece) board.removePiece(source);
+		p.increaseMoveCount();
 		
 		//segundo: remover a peça que possa estar na posição de destino, ou seja, capturá-la.
 		Piece capturedPiece = board.removePiece(target);
@@ -125,7 +126,8 @@ public class ChessMatch {
 	private void undoMove(Position source, Position target, Piece capturedPiece) {
 		/*primeiro: lógica de Check. Se o movimento for deixar o rei em check, precisamos desfazê-lo.
 		 *Aqui devolvemos a peça que teria sido movida ao local onde ela estava. */
-		Piece p = board.removePiece(target);
+		ChessPiece p = (ChessPiece)board.removePiece(target);
+		p.decreaseMoveCount();
 		board.placePiece(p, source);
 		//segundo: se uma peça fosse capturada, temos que devolvê-la à sua origem tambem
 		if (capturedPiece != null) {

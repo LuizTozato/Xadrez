@@ -20,7 +20,7 @@ public class Program {
 		//instanciar a lista de peças que serão capturadas
 		List<ChessPiece> captured = new ArrayList<>();
 
-		while (chessMatch.getCheckMate() == false) {
+		while (!chessMatch.getCheckMate()) {
 			try {
 				UI.clearScreen();
 				UI.printMatch(chessMatch, captured);

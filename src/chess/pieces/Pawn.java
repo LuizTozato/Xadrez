@@ -2,14 +2,19 @@ package chess.pieces;
 
 import boardgame.Board;
 import boardgame.Position;
+import chess.ChessMatch;
 import chess.ChessPiece;
 import chess.Color;
 
 public class Pawn extends ChessPiece{
 
-	public Pawn(Board board, Color color) {
+	//criando uma dependência para a partida
+	private ChessMatch chessMatch;
+	
+	//Construtor
+	public Pawn(Board board, Color color, ChessMatch chessMatch) {
 		super(board, color);
-		
+		this.chessMatch = chessMatch;
 	}
 
 	@Override
@@ -45,7 +50,22 @@ public class Pawn extends ChessPiece{
 			//Move de ataque direita: se a posição existe e tem inimigo lá, podemos mover para lá.
 			if( getBoard().positionExists(p) && isThereOpponentPiece(p)) {
 				mat[p.getRow()][p.getColumn()] = true;
-			}				
+			}
+			
+			// #specialMove: en passant BRANCO
+			//vou testar se o peão branco está na linha 3 da matriz, único local possível para a jogada ocorrer
+			if (position.getRow() == 3) {
+				Position left = new Position(position.getRow(), position.getColumn() - 1);
+				//se a posição à esquerda existir && for inimiga && estiver vulnerável
+				if (getBoard().positionExists(left) && isThereOpponentPiece(left) && getBoard().piece(left) == chessMatch.getEnPassantVulnerable()) {
+					mat[left.getRow() - 1][left.getColumn()] = true;
+				}
+				Position right = new Position(position.getRow(), position.getColumn() + 1);
+				//se a posição à direita existir && for inimiga && estiver vulnerável
+				if (getBoard().positionExists(right) && isThereOpponentPiece(right) && getBoard().piece(right) == chessMatch.getEnPassantVulnerable()) {
+					mat[right.getRow() - 1][right.getColumn()] = true;
+				}
+			}
 		}
 		else {//se a peça não é branca, é pq é preta.
 			//pegar a posição logo abaixo, olhando para o tabuleiro.
@@ -75,7 +95,26 @@ public class Pawn extends ChessPiece{
 			if( getBoard().positionExists(p) && isThereOpponentPiece(p)) {
 				mat[p.getRow()][p.getColumn()] = true;
 			}	
+			
+			// #specialMove: en passant PRETO
+			//vou testar se o peão preto está na linha 4 da matriz, único local possível para a jogada ocorrer
+			if (position.getRow() == 4) {
+				Position left = new Position(position.getRow(), position.getColumn() - 1);
+				//se a posição à esquerda existir && for inimiga && estiver vulnerável
+				if (getBoard().positionExists(left) && isThereOpponentPiece(left) && getBoard().piece(left) == chessMatch.getEnPassantVulnerable()) {
+					mat[left.getRow() + 1][left.getColumn()] = true;
+				}
+				Position right = new Position(position.getRow(), position.getColumn() + 1);
+				//se a posição à direita existir && for inimiga && estiver vulnerável
+				if (getBoard().positionExists(right) && isThereOpponentPiece(right) && getBoard().piece(right) == chessMatch.getEnPassantVulnerable()) {
+					mat[right.getRow() + 1][right.getColumn()] = true;
+				}
+			}		
 		
+			
+			
+			
+			
 		
 		}
 		

@@ -1,5 +1,6 @@
 package chess;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,6 +23,7 @@ public class ChessMatch {
 	private boolean check = false;
 	private boolean checkMate = false;
 	private ChessPiece enPassantVulnerable;
+	private ChessPiece promoted;
 
 	private List<Piece> piecesOnTheBoard = new ArrayList<>();
 	private List<Piece> capturedPieces = new ArrayList<>();
@@ -54,6 +56,10 @@ public class ChessMatch {
 	public ChessPiece getEnPassantVulnerable(){
 		//não precisa colocar no construtor pois já tem valor inicial Null.
 		return enPassantVulnerable;
+	}
+	
+	public ChessPiece getPromoted() {
+		return promoted;
 	}
 	
 	public ChessPiece[][] getPieces() {
@@ -104,6 +110,16 @@ public class ChessMatch {
 		// obs: só criando uma referência à peça movida pois vou usar logo mais
 		ChessPiece movedPiece = (ChessPiece) board.piece(target); 
 		
+		// #specialMove promotion
+		promoted = null;
+		if (movedPiece instanceof Pawn) {
+			//se o peão branco chegou na linha 0 da matriz ou o peão preto chegou na linha 7, ele será promovido
+			if((movedPiece.getColor() == Color.WHITE && target.getRow() == 0) || (movedPiece.getColor() == Color.BLACK && target.getRow() == 7) ) {
+					promoted = (ChessPiece)board.piece(target);
+					//por padrão, já vou deixar a rainha colocada. Se o usuário quiser outro, a outra função fará a troca.
+					promoted = replacePromotedPiece("Q");
+			}
+		}
 		
 		// quarto: se o oponente ficou em check, marcar verdadeiro, senão, falso.
 		check = (testCheck(opponent(currentPlayer)) == true) ? true : false;
@@ -125,15 +141,46 @@ public class ChessMatch {
 		else {
 			enPassantVulnerable = null;
 		}
-		
-		
-		
 
 		// oitavo: retornar a peça capturada (Piece) em formato ChessPiece (usar
 		// downcasting).
 		return (ChessPiece) capturedPiece;
 	}
 
+	public ChessPiece replacePromotedPiece(String type) {
+		if (promoted == null) {
+			throw new IllegalStateException("There is no piece to be promoted.");
+		}
+		if (!type.equals("B") && !type.equals("R") && !type.equals("N") && !type.equals("Q")) {
+			//obs: usar o comando "equals" pq o string é do tipo Classe e não primitivo
+			throw new InvalidParameterException("Invalid type for promotion.");
+		}
+		
+		//pegar a posição da peça a ser promovida. Ela vira é coordenadas de xadrez. Transformar para coordenadas de matriz.
+		Position pos = promoted.getChessPosition().toPosition();
+		//remover a peça do tabuleiro
+		Piece p = board.removePiece(pos);
+		//tirar a peça da lista das peças no tabuleiro
+		piecesOnTheBoard.remove(p);
+		
+		//agora vou instanciar a peça nova
+		ChessPiece newPiece = newPiece(type, promoted.getColor());
+		//colocar a peça no tabuleiro
+		board.placePiece(newPiece, pos);
+		//adicionar a peça nova criada na lista das peças presentes no tabuleiro
+		piecesOnTheBoard.add(newPiece);
+		
+		return newPiece;		
+	}
+	
+	//função auxiliar
+	private ChessPiece newPiece(String type, Color color) {
+		if(type.equals("B")) return new Bishop(board, color);
+		if(type.equals("Q")) return new Queen(board, color);
+		if(type.equals("N")) return new Knight(board, color);
+		return new Rook(board, color);
+	}
+	
 	private Piece makeMove(Position source, Position target) {
 		// primeiro: retirar a peça na posição de origem. Usando downcasting.
 		ChessPiece p = (ChessPiece) board.removePiece(source);
@@ -264,7 +311,6 @@ public class ChessMatch {
 			
 	}
 	
-
 	private void validateSourcePosition(Position position) {
 		// primeiro: se não tiver uma peça na posição recebida por argumento, lanço
 		// exceção.

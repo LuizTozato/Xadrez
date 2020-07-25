@@ -1,6 +1,5 @@
 package chess;
 
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -153,7 +152,7 @@ public class ChessMatch {
 		}
 		if (!type.equals("B") && !type.equals("R") && !type.equals("N") && !type.equals("Q")) {
 			//obs: usar o comando "equals" pq o string é do tipo Classe e não primitivo
-			throw new InvalidParameterException("Invalid type for promotion.");
+			return promoted; //a rainha já está lá pela função performChessMove
 		}
 		
 		//pegar a posição da peça a ser promovida. Ela vira é coordenadas de xadrez. Transformar para coordenadas de matriz.
